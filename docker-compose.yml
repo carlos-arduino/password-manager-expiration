@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: password_manager
+      POSTGRES_DB: password_manager_expiration_development
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    volumes:
+      - .:/password-manager-expiration
+      - bundle_cache:/usr/local/bundle
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://password_manager:password@db:5432/password_manager_expiration_development
+      RAILS_ENV: development
+      RAILS_MAX_THREADS: 5
+      REDIS_URL: redis://redis:6379/1
+
+volumes:
+  postgres_data:
+  bundle_cache:
